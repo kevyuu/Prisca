@@ -1,10 +1,5 @@
-#include <iostream>
-
-// GLEW
-#define GLEW_STATIC
-#include <GL/glew.h>
-
 // GLFW
+#include "render.h"
 #include <GLFW/glfw3.h>
 
 // Function prototypes
@@ -49,7 +44,8 @@ int main()
     // Define the viewport dimensions
     int width, height;
     glfwGetFramebufferSize(window, &width, &height);  
-    glViewport(0, 0, width, height);
+    
+    GLRender::Init(width, height);
 
     // Game loop
     while (!glfwWindowShouldClose(window))
@@ -57,15 +53,14 @@ int main()
         // Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
         glfwPollEvents();
 
-        // Render
-        // Clear the colorbuffer
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        GLRender::Render();
 
         // Swap the screen buffers
         glfwSwapBuffers(window);
     }
 
+    GLRender::Cleanup();
+    
     // Terminate GLFW, clearing any resources allocated by GLFW.
     glfwTerminate();
     return 0;
