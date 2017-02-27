@@ -1,6 +1,9 @@
 // GLFW
 #include "render.h"
 #include <GLFW/glfw3.h>
+#include <iostream>
+
+#include "prisca.h"
 
 // Function prototypes
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
@@ -53,7 +56,22 @@ int main()
         // Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
         glfwPollEvents();
 
-        GLRender::Render();
+        if (glfwGetWindowAttrib(window, GLFW_FOCUSED)) {
+            double mouse_x, mouse_y;
+            glfwGetCursorPos(window, &mouse_x, &mouse_y);
+            Prisca::g_UIState.mouse_pos = {(float)mouse_x, (float)mouse_y};
+        } else {
+            Prisca::g_UIState.mouse_pos = {-1, -1};
+        }
+
+        Prisca::g_UIState.mouse_down = glfwGetMouseButton(window, 1) == GLFW_PRESS;
+        Prisca::NewFrame();
+
+        if (Prisca::Button(1, {{10.0f, 10.0f}, {400.0f, 400.0f}}, {0.2f, 0.5f, 0.0f, 1.0f})) {
+            std::cout<<"You click the button\n";
+        }
+        
+        GLRender::Render(&Prisca::g_RenderOutput);
 
         // Swap the screen buffers
         glfwSwapBuffers(window);
@@ -69,7 +87,6 @@ int main()
 // Is called whenever a key is pressed/released via GLFW
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
-    std::cout << key << std::endl;
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GL_TRUE);
 }

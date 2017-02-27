@@ -3,9 +3,9 @@
 set additinalLibPath=/LIBPATH:..\external\lib
 set externallib=opengl32.lib user32.lib gdi32.lib kernel32.lib shell32.lib glfw3.lib glew32s.lib SOIL.lib
 set cppfiles=..\demo\main.cpp
-set includedir=/I..\external\include
+set includedir=/I..\external\include /I..\prisca
 set outputfile=prisca_demo
-rmdir /S /Q build
+rmdir /S /Q bin
 mkdir bin
 
 pushd bin
