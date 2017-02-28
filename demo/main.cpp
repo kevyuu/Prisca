@@ -48,6 +48,7 @@ int main()
     int width, height;
     glfwGetFramebufferSize(window, &width, &height);  
     
+    Prisca::Init();
     GLRender::Init(width, height);
 
     // Game loop
@@ -59,16 +60,20 @@ int main()
         if (glfwGetWindowAttrib(window, GLFW_FOCUSED)) {
             double mouse_x, mouse_y;
             glfwGetCursorPos(window, &mouse_x, &mouse_y);
-            Prisca::g_UIState.mouse_pos = {(float)mouse_x, (float)mouse_y};
+            Prisca::g_UIState.mouse_pos = {(float)mouse_x, HEIGHT - (float)mouse_y};
         } else {
             Prisca::g_UIState.mouse_pos = {-1, -1};
         }
 
         Prisca::g_UIState.mouse_down = glfwGetMouseButton(window, 1) == GLFW_PRESS;
         Prisca::NewFrame();
+        
+        if (Prisca::Button(1, {{10.0f, 10.0f}, {200.0f, 200.0f}}, {0.2f, 0.5f, 0.0f, 1.0f})) {
+            std::cout<<"You click the button\n"<<std::endl;
+        }
 
-        if (Prisca::Button(1, {{10.0f, 10.0f}, {400.0f, 400.0f}}, {0.2f, 0.5f, 0.0f, 1.0f})) {
-            std::cout<<"You click the button\n";
+        if (Prisca::Button(2, {{210.0f, 210.0f}, {310.0f, 310.0f}}, {0.0f, 0.2f, 0.5f, 1.0f})) {
+            std::cout<<"You click the second button\n"<<std::endl;
         }
         
         GLRender::Render(&Prisca::g_RenderOutput);
@@ -78,7 +83,8 @@ int main()
     }
 
     GLRender::Cleanup();
-    
+    Prisca::Cleanup();
+
     // Terminate GLFW, clearing any resources allocated by GLFW.
     glfwTerminate();
     return 0;

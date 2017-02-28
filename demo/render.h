@@ -18,7 +18,7 @@ namespace GLRender {
             "uniform float height;\n"
             "void main()\n"
             "{\n"
-            "gl_Position = vec4(position.x * 2 / width - 1, position.y * 2 / height * 2 - 1, 0, 1.0);\n"
+            "gl_Position = vec4(position.x * 2 / width - 1, position.y * 2 / height - 1, 0, 1.0);\n"
             "frag_color = color;\n"
             "}\0";
 
@@ -121,10 +121,10 @@ namespace GLRender {
         int index_offset = 0;
 
         glBindVertexArray(g_Context.vao_id);
-        for (int i = 0; i < ro.commands.count; ++i) {
+        for (int i = 0; i < Prisca::Array::Size(ro.commands); ++i) {
+            Prisca::RenderOutput& ro = (*render_output);
+            Prisca::RenderCommand& command = ro.commands.element[i];
 
-            Prisca::RenderCommand& command = render_output->commands.Get(i);
-        
             glBindBuffer(GL_ARRAY_BUFFER, g_Context.vbo_id);
             glBufferSubData(GL_ARRAY_BUFFER, 
                             vertex_offset, 

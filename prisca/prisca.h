@@ -1,5 +1,5 @@
 #pragma once
-#include "common.h"
+#include "adt.h"
 #include <iostream>
 
 namespace Prisca {
@@ -55,76 +55,60 @@ namespace Prisca {
     };
 
     struct RenderOutput {
-        Array<RenderVertex> vertexes;
-        Array<RenderIndex> indexes;
-        Array<RenderCommand> commands;
+        Array::Buffer<RenderVertex> vertexes;
+        Array::Buffer<RenderIndex> indexes;
+        Array::Buffer<RenderCommand> commands;
     } g_RenderOutput;
 
     void Init() {
-        g_RenderOutput.vertexes.Init();
-        g_RenderOutput.indexes.Init();
-        g_RenderOutput.commands.Init();
+        RenderOutput& ro = g_RenderOutput;
+        Array::Init(ro.vertexes);
+        Array::Init(ro.indexes);
+        Array::Init(ro.commands);
     }
 
     void Cleanup() {
-        g_RenderOutput.vertexes.Cleanup();
-        g_RenderOutput.indexes.Cleanup();
-        g_RenderOutput.commands.Cleanup();   
+        RenderOutput& ro = g_RenderOutput;
+        Array::Cleanup(ro.vertexes);
+        Array::Cleanup(ro.indexes);
+        Array::Cleanup(ro.commands);   
     }
 
     void PushLayer() {
-        g_RenderOutput.commands.Add(1) = {0, 0};
+        RenderOutput& ro = g_RenderOutput;
+        Array::Add(ro.commands, 1);
+        Array::Last(ro.commands) = {0, 0};
     }
 
     void NewFrame() {
-        g_RenderOutput.vertexes.Clear();
-        g_RenderOutput.indexes.Clear();
-        g_RenderOutput.commands.Clear();
+        RenderOutput& ro = g_RenderOutput;
+        Array::Clear(ro.vertexes);
+        Array::Clear(ro.indexes);
+        Array::Clear(ro.commands);
         PushLayer();
     }
 
-    void PushRect(Rect rect, Color color) {        
-        RenderVertex vertex1 = {rect.min, color};
-        RenderVertex vertex2 = {{rect.min.x, rect.max.y}, color};
-        RenderVertex vertex3 = {{rect.max.x, rect.min.y}, color};
-        RenderVertex vertex4 = {rect.max, color};
+    void PushRect(Rect rect, Color color) {     
+        RenderOutput& ro = g_RenderOutput;
 
-        int offset = g_RenderOutput.vertexes.count;
+        int offset = ro.vertexes.count;
+        Array::PushAndBack(ro.vertexes) = {rect.min, color };
+        Array::PushAndBack(ro.vertexes) = {{rect.min.x, rect.max.y}, color};
+        Array::PushAndBack(ro.vertexes) = {{rect.max.x, rect.min.y}, color};
+        Array::PushAndBack(ro.vertexes) = {rect.max, color};
 
-        g_RenderOutput.vertexes.Add(1) = {rect.min, color};
-        g_RenderOutput.vertexes.Add(1) = {{rect.min.x, rect.max.y}, color};
-        g_RenderOutput.vertexes.Add(1) = {{rect.max.x, rect.min.y}, color};
-        g_RenderOutput.vertexes.Add(1) = {rect.max, color};
+        Array::PushAndBack(ro.indexes) = offset;
+        Array::PushAndBack(ro.indexes) = offset + 1;
+        Array::PushAndBack(ro.indexes) = offset + 2;
+        Array::PushAndBack(ro.indexes) = offset + 1;
+        Array::PushAndBack(ro.indexes) = offset + 2;
+        Array::PushAndBack(ro.indexes) = offset + 3;
 
-        g_RenderOutput.indexes.Add(1) = offset;
-        g_RenderOutput.indexes.Add(1) = offset + 1;
-        g_RenderOutput.indexes.Add(1) = offset + 2;
-        g_RenderOutput.indexes.Add(1) = offset + 1;
-        g_RenderOutput.indexes.Add(1) = offset + 2;
-        g_RenderOutput.indexes.Add(1) = offset + 3;
-
-        g_RenderOutput.commands.Last().n_vertex += 4;
-        g_RenderOutput.commands.Last().n_index += 6;
+        Array::Last(ro.commands).n_vertex += 4;
+        Array::Last(ro.commands).n_index += 6;
     }
 
 
-    int Button(int id, Rect rect, Color color) {
-        PushRect(rect, color);
-        if (rect.Contain(g_UIState.mouse_pos)) {
-            g_UIState.hot_id = id;
-        } else if (g_UIState.hot_id == id) {
-            g_UIState.hot_id = -1;
-            g_UIState.active_id = -1;
-        }
-
-        if (g_UIState.hot_id == id && g_UIState.mouse_down) {
-            g_UIState.active_id = id;
-        }
-        if (g_UIState.active_id == id && !g_UIState.mouse_down) {
-            g_UIState.active_id = -1;
-            return true;
-        }
-        return false;
-    }
+    
 
 }
