@@ -30,7 +30,6 @@ namespace Prisca {
 
         template<typename T>
         void Grow(Buffer<T>& buffer, int growth_factor) {
-            std::cout<<"Array::Grow()"<<std::endl;
             T* old_element = buffer.element;
             buffer.element = (T*) malloc(growth_factor * buffer.capacity * sizeof(T));
             memcpy(buffer.element, old_element, buffer.capacity * sizeof(T));
